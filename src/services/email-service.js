@@ -1,5 +1,7 @@
 const sender = require('../config/email-config');
+const EmailRepository = require('../repository/email-repository');
 
+const emailRepository= new EmailRepository();
 const sendBasicEmail = (mailFrom,mailTo,mailSubject,mailBody) => {
     //* try-catch is not necessary here but it's good practice to handle potential errors
     try{
@@ -17,7 +19,40 @@ const sendBasicEmail = (mailFrom,mailTo,mailSubject,mailBody) => {
     }
 }
 
+//* fetch all the emails which are pending before this timestamp
+const fetchPendingEmails= async () => {
+    try{
+        const response= await emailRepository.get({status: 'PENDING'});
+        return response;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+const createNotification = async (data) =>{
+    try{
+        const response=await emailRepository.create(data);
+        return response;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+const updateNotification=async (ticketId,data)=>{
+    try{
+        const response=await emailRepository.update(ticketId,data);
+        return response;
+    }
+    catch(error){
+        throw error;
+    }
+}
 
 module.exports={
-    sendBasicEmail
+    sendBasicEmail,
+    fetchPendingEmails,
+    createNotification,
+    updateNotification
 }
