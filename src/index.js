@@ -1,6 +1,6 @@
 const express = require('express');
-const { PORT , DB_SYNC } = require('./config/server-config');
-// const db = require('./models/index');
+const { PORT } = require('./config/server-config');
+const { sendBasicEmail } = require('./services/email-service');
 
 function setupAndStartServer(){
     const app=express();
@@ -10,11 +10,15 @@ function setupAndStartServer(){
 
     app.listen(PORT,()=>{
         console.log(`Server started on port ${PORT}`);
-    });
 
-    if(DB_SYNC){
-        db.sequelize.sync({alter:true});
-    }
+        sendBasicEmail(
+            'support@admin.com',
+            'xyzflips24@gmail.com',
+            'Flight Details',
+            'Hey, I hope you are doing well.\nPlease find the flight details attached and thankyou for travelling with us.😊'
+        );
+    });
+    
 }
 
 setupAndStartServer();
