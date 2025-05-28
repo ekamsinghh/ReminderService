@@ -1,21 +1,23 @@
 const express = require('express');
-const { PORT } = require('./config/server-config');
+const { PORT, REMINDER_BINDING_KEY } = require('./config/server-config');
+const EmailService = require('./services/email-service');
+const {createChannel , subscribeMessage}= require('./utils/messageQueue');
 // const { sendBasicEmail } = require('./services/email-service');
 const apiRoutes = require("./router/index");
 const jobs= require('./utils/job');
 
-function setupAndStartServer(){
+const setupAndStartServer= async () => {
     const app=express();
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
     app.use("/api",apiRoutes);
-
+    const channel=await createChannel();
     app.listen(PORT,()=>{
         console.log(`Server started on port ${PORT}`);
-        
-        jobs();
+        subscribeMessage(channel,EmailService.subscribedEvents,REMINDER_BINDING_KEY);
+        // jobs();
 
         // sendBasicEmail(
         //     'support@admin.com',
